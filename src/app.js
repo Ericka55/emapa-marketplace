@@ -16,8 +16,13 @@ import path from "path";
 
 
 const app = express();
-
-app.use(cors());
+app.use(cors({
+    origin: [
+        "http://localhost:5173",
+        "https://tu-frontend.vercel.app"
+    ],
+    credentials: true
+}));
 app.use(express.json());
 app.use("/api/admin", adminRoutes);
 app.use("/api/categorias", categoriaRoutes);
@@ -51,11 +56,4 @@ app.use(
 app.use("/api/carrito", carritoRoutes);
 app.use("/api/pagos", pagoRoutes);
 app.use("/api", resenaRoutes);
-app.use(cors({
-    origin: [
-        "http://localhost:5173",
-        "https://tu-frontend.vercel.app"
-    ],
-    credentials: true
-}));
 export default app;
