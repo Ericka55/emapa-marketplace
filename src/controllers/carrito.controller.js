@@ -157,3 +157,23 @@ export const actualizarCantidad = async (req, res) => {
         });
     }
 };
+export const eliminarDelCarrito = async (req, res) => {
+    try {
+        const id = Number(req.params.id);
+
+        await prisma.carritoDetalle.delete({
+            where: { id }
+        });
+
+        return res.json({
+            success: true,
+            message: "Producto eliminado del carrito"
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};

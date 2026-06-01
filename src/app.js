@@ -12,6 +12,9 @@ import pedidoRoutes from "./routes/pedido.routes.js";
 import pedidoVendedorRoutes from "./routes/pedidoVendedor.routes.js";
 import resenaRoutes from "./routes/resena.routes.js";
 import incidenciaRoutes from "./routes/incidencia.routes.js"
+import path from "path";
+
+
 const app = express();
 
 app.use(cors());
@@ -22,6 +25,10 @@ app.use("/api/categorias", categoriaRoutes);
 app.use(
     "/api/vendedor",
     vendedorRoutes
+);
+app.use(
+    "/uploads",
+    express.static(path.join(process.cwd(), "uploads"))
 );
 app.use("/api/incidencias", incidenciaRoutes);
 app.use("/api/auth", authRoutes);
@@ -44,4 +51,11 @@ app.use(
 app.use("/api/carrito", carritoRoutes);
 app.use("/api/pagos", pagoRoutes);
 app.use("/api", resenaRoutes);
+app.use(cors({
+    origin: [
+        "http://localhost:5173",
+        "https://tu-frontend.vercel.app"
+    ],
+    credentials: true
+}));
 export default app;

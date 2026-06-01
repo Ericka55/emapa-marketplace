@@ -3,7 +3,7 @@ import { Router } from "express";
 import {
     agregar,
     verCarrito,
-    checkout, actualizarCantidad
+    checkout, actualizarCantidad, eliminarDelCarrito
 } from "../controllers/carrito.controller.js";
 
 import { verifyToken } from "../middlewares/auth.middleware.js";
@@ -36,4 +36,5 @@ router.put(
     authorizeRoles("COMPRADOR"),
     actualizarCantidad
 );
+router.delete("/:id", eliminarDelCarrito);
 export default router;

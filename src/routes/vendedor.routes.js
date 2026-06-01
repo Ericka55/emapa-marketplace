@@ -1,5 +1,5 @@
 import { Router } from "express";
-
+import upload from "../middlewares/upload.js";
 import {
 solicitarVendedor,
 dashboard,
@@ -51,10 +51,11 @@ misProductos
 );
 
 router.post(
-"/productos",
-verifyToken,
-authorizeRoles("VENDEDOR"),
-crearProducto
+    "/productos",
+    verifyToken,
+    authorizeRoles("VENDEDOR"),
+    upload.single("imagen"),
+    crearProducto
 );
 
 router.put(

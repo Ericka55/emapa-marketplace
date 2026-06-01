@@ -7,8 +7,9 @@ import {
 } from "../services/producto.service.js";
 
 export const crear = async (req, res) => {
-
     try {
+        console.log("BODY:", req.body);
+        console.log("FILE:", req.file);
 
         const vendedor = await prisma.vendedor.findUnique({
             where: {
@@ -23,23 +24,61 @@ export const crear = async (req, res) => {
             });
         }
 
-        const producto = await crearProducto(
-            vendedor.id,
-            req.body
-        );
+        // 🔥 FIX: validar datos
+        const {
+            nombre,
+            descripcion,
+            precio,
+            stock,
+            categoriaId
+        } = req.body;
+
+        if (!nombre || !precio || !stock || !categoriaId) {
+            return res.status(400).json({
+                success: false,
+                message: "Faltan datos del producto"
+            });
+        }
+
+        const producto = await prisma.producto.create({
+            data: {
+                vendedorId: vendedor.id,
+                categoriaId: Number(categoriaId),
+                nombre,
+                descripcion,
+                precio: Number(precio),
+                stock: Number(stock)
+            }
+        });
+
+        // 🖼️ IMAGEN
+        if (req.file) {
+            await prisma.imagenProducto.create({
+                data: {
+                    productoId: producto.id,
+                    urlImagen: `/uploads/${req.file.filename}`,
+                    principal: true
+                }
+            });
+        }
+
+        const productoCompleto = await prisma.producto.findUnique({
+            where: { id: producto.id },
+            include: { imagenes: true }
+        });
 
         return res.status(201).json({
             success: true,
-            data: producto
+            data: productoCompleto
         });
 
     } catch (error) {
+        console.log("🔥 ERROR CREANDO PRODUCTO:", error);
 
         return res.status(500).json({
             success: false,
             message: error.message
         });
-
     }
 };
 export const listar = async (

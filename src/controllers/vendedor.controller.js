@@ -67,7 +67,6 @@ export const dashboard = async (req, res) => {
 };
 export const eliminarProducto = async (req, res) => {
 
-```
 try {
 
     await prisma.producto.delete({
@@ -89,7 +88,6 @@ try {
     });
 
 }
-```
 
 };
 
@@ -120,17 +118,35 @@ export const misProductos = async (req, res) => {
 
 };
 
-export const crearProducto = async (req, res) => {
 
-    const vendedor =
-        await prisma.vendedor.findUnique({
+export const crearProducto = async (req, res) => {
+    try {
+
+        console.log("BODY:", req.body);
+        console.log("FILE:", req.file);
+
+        const vendedor = await prisma.vendedor.findUnique({
             where: {
                 usuarioId: req.user.id
             }
         });
 
-    const producto =
-        await prisma.producto.create({
+        if (!vendedor) {
+            return res.status(404).json({
+                success: false,
+                message: "Vendedor no encontrado"
+            });
+        }
+
+        // 🚨 VALIDACIÓN CLAVE
+        if (!req.body || !req.body.categoriaId) {
+            return res.status(400).json({
+                success: false,
+                message: "categoriaId es obligatorio o req.body no llegó"
+            });
+        }
+
+        const producto = await prisma.producto.create({
             data: {
                 vendedorId: vendedor.id,
                 categoriaId: Number(req.body.categoriaId),
@@ -141,34 +157,35 @@ export const crearProducto = async (req, res) => {
             }
         });
 
-    if (req.body.imagen) {
+        if (req.file) {
+            await prisma.imagenProducto.create({
+                data: {
+                    productoId: producto.id,
+                    urlImagen: `/uploads/${req.file.filename}`,
+                    principal: true
+                }
+            });
+        }
 
-        await prisma.imagenProducto.create({
-            data: {
-                productoId: producto.id,
-                urlImagen: req.body.imagen,
-                principal: true
-            }
+        const productoCompleto = await prisma.producto.findUnique({
+            where: { id: producto.id },
+            include: { imagenes: true }
         });
 
+        return res.status(201).json({
+            success: true,
+            data: productoCompleto
+        });
+
+    } catch (error) {
+        console.log("🔥 ERROR CREANDO PRODUCTO:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
     }
-
-    const productoCompleto =
-        await prisma.producto.findUnique({
-            where: {
-                id: producto.id
-            },
-            include: {
-                imagenes: true
-            }
-        });
-
-    res.json({
-        success: true,
-        data: productoCompleto
-    });
 };
-
 export const actualizarStock = async (req, res) => {
 
     const producto =

@@ -9,6 +9,7 @@ import {
 
 import { verifyToken } from "../middlewares/auth.middleware.js";
 import { authorizeRoles } from "../middlewares/role.middleware.js";
+import upload from "../middlewares/upload.js";
 
 const router = Router();
 
@@ -16,6 +17,7 @@ router.post(
     "/",
     verifyToken,
     authorizeRoles("VENDEDOR"),
+    upload.single("imagen"), // 👈 AQUÍ
     crear
 );
 router.get(
