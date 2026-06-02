@@ -24,7 +24,7 @@ export const registerUser = async (data) => {
         telefono: data.telefono,
         password: hashedPassword,
 
-        rol: "COMPRADOR",
+        rol: data.tipo, // 🔥 FIX REAL
 
         estado:
             data.tipo === "VENDEDOR"
