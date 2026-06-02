@@ -19,7 +19,7 @@ const app = express();
 app.use(cors({
     origin: [
         "http://localhost:5173",
-        "https://tu-frontend.vercel.app"
+        "https://emapa-marketplace-frontend.vercel.app"
     ],
     credentials: true
 }));
